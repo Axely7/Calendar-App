@@ -22,7 +22,7 @@ export const LoginPage = () => {
                                 placeholder="Contraseña"
                             />
                         </div>
-                        <div className="form-group mb-2">
+                        <div className="d-grid gap-2">
                             <input 
                                 type="submit"
                                 className="btnSubmit"
@@ -65,7 +65,7 @@ export const LoginPage = () => {
                             />
                         </div>
 
-                        <div className="form-group mb-2">
+                        <div className="d-grid gap-2">
                             <input 
                                 type="submit" 
                                 className="btnSubmit" 
