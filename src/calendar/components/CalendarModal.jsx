@@ -1,12 +1,12 @@
 import { addHours, differenceInSeconds } from 'date-fns';
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.min.css'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Modal from 'react-modal'
 import DatePicker, {registerLocale} from "react-datepicker";
 import es from 'date-fns/locale/es';
 import "react-datepicker/dist/react-datepicker.css";
-import { useUIStore } from '../../hooks';
+import { useCalendarStore, useUIStore } from '../../hooks';
 
 registerLocale('es', es)
 
@@ -28,11 +28,12 @@ const customStyles = {
 export const CalendarModal = () => {
 
   const {isDateModalOpen, closeDateModal} = useUIStore()
+  const {activeEvent, startSavingEvent} = useCalendarStore()
  
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [formValues, setFormValues] = useState({
-    title: 'Axel',
-    notes: "Jimenez",
+    title: '',
+    notes: "",
     start: new Date(),
     end: addHours(new Date(), 2)
   })
@@ -43,6 +44,15 @@ export const CalendarModal = () => {
     return(formValues.title.length > 0) ? '' : 'is-invalid'
     
   }, [formValues.title, formSubmitted])
+
+
+  useEffect(() => {
+   if(activeEvent !== null){
+    setFormValues({...activeEvent})
+   }
+  }, [activeEvent])
+  
+
 
   const onInputChange = ({target}) => {
     setFormValues({
@@ -58,19 +68,23 @@ export const CalendarModal = () => {
     })
   }
 
-    const onSubmit = (event) => {
-        event.preventDefault();
-        setFormSubmitted(true)
-        const difference = differenceInSeconds(formValues.end, formValues.start)
-        
-        if(isNaN(difference) || difference <= 0){
-            Swal.fire('Fechas Incorrectas', 'Revisar las fechas ingresadas', 'error')
-            return
-        }
+    const onSubmit = async (event) => {
+      event.preventDefault();
+      setFormSubmitted(true)
+      const difference = differenceInSeconds(formValues.end, formValues.start)
+      
+      if(isNaN(difference) || difference <= 0){
+          Swal.fire('Fechas Incorrectas', 'Revisar las fechas ingresadas', 'error')
+          return
+      }
 
-        if(formValues.title.length <= 0) return
+      if(formValues.title.length <= 0) return
 
-        console.log(formValues)
+      console.log(formValues)
+
+      await startSavingEvent(formValues)
+      closeDateModal()
+      setFormSubmitted(false)
     }
 
 
