@@ -1,5 +1,6 @@
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import calendarApi from '../api/calendarApi'
 import { onAddNewEvent, onDeleteEvent, onSetActiveEvent, onUpdateEvent } from '../store'
 
 export const useCalendarStore = () => {
@@ -20,6 +21,8 @@ export const useCalendarStore = () => {
 
       } else {
         // creando
+        const {data} = await calendarApi.post('/event', calendarEvent)
+        console.log(data)
         dispatch(onAddNewEvent({...calendarEvent, _id: new Date().getTime()}))
 
       }
