@@ -1,4 +1,4 @@
-export const tempEvent = [
+export const events = [
     {
         id: '1',
         title: 'Cumpleaños de Axel',
