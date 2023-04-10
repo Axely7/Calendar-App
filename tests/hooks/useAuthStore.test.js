@@ -128,13 +128,54 @@ describe('Pruebas en el useAuthStore', () => {
 
         const {errorMessage, status, user} = result.current
         expect({errorMessage, status, user}).toEqual({
-            errorMessage: undefined,
-            status: 'authenticated',
-            user: { name: 'Test User', uid: '123456789' }
+            errorMessage: "Un usuario existe con ese correo",
+            status: 'not-authenticated',
+            user: { }
+          })
+        })
+    
+        test('checkAuthToken debe de fallar si no hay token', async () => { 
+            const mockStore = getMockStore({...initialState})
+            const {result} = renderHook(() => useAuthStore(), {wrapper: ({children}) => <Provider store={mockStore}>{children}</Provider>})
+
+            console.log('token',localStorage.getItem("token"))
+    
+           await  act(async() => {
+                await result.current.checkAuthToken()
+            });
+
+
+            const {errorMessage, status, user} = result.current 
+            expect({errorMessage, status, user}).toEqual({
+                errorMessage: undefined,
+                status: 'not-authenticated',
+                user: {}
+            })
+         })
+
+         test('checkAuthToken debe de autenticar el usuario si hay un token', async () => { 
+            const {data} = await calendarApi.post('/auth', testUserCredentials)
+            localStorage.setItem('token', data.token)
+
+            const mockStore = getMockStore({...initialState})
+            const {result} = renderHook(() => useAuthStore(), {wrapper: ({children}) => <Provider store={mockStore}>{children}</Provider>})
+
+            console.log('token',localStorage.getItem("token"))
+    
+           await  act(async() => {
+                await result.current.checkAuthToken()
+            });
+
+
+            const {errorMessage, status, user} = result.current 
+            expect({errorMessage, status, user}).toEqual({
+                errorMessage: undefined,
+                status: 'authenticated',
+                user: {name: 'Test User', uid: '642d9c976c81f6549f38c9b2'}
+            })
+
           })
 
-      
-    })
 
       
  })
